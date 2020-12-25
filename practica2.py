@@ -10,17 +10,18 @@ from Logistic_Regression import Plotter
 import numpy as np
 import base64
 
-def ejecutar():
-    
+def ejecutar(universidad):
+
     #y = json.dumps(parametroU)
     #m = json.loads(y)
     #parametro = m["universidad"]
-
+    nModelo = 0;
     ONLY_SHOW = False #Veo si quiero mostrar una imagen del conjunto de datos
 
-    #Cargando conjuntos de datos
-    train_set_x_orig, train_set_y, test_set_x_orig, test_set_y, classes = File.load_dataset("Mariano")
-
+    #Cargando conjuntos de datos con for para hacer todos los modelos de una vez 
+    
+    train_set_x_orig, train_set_y, test_set_x_orig, test_set_y, uni, classes = File.load_dataset(universidad)
+    
     if ONLY_SHOW:
         #index = 14 #Gato
         index = 100 #No Gato
@@ -44,6 +45,7 @@ def ejecutar():
     # Vean la diferencia de la conversion
     print('Original: ', train_set_x_orig.shape)
     print('Con reshape: ', train_set_x.shape)
+    print('universidad: ' + uni)
 
     #print('tamaño train_set_x_orig: ', len(train_set_x_orig))
     #print('tamaño train_set_x: ', len(train_set_x))
@@ -61,23 +63,30 @@ def ejecutar():
     test_set = Data(test_set_x, test_set_y, 255)
 
     # Se entrenan los modelos
-    model1 = Model(train_set, test_set, reg=False, alpha=0.0001, lam=310, maxi=1000)
+    nModelo = 1;
+    model1 = Model(train_set, test_set, reg=False, alpha=0.001, lam=310, maxi=1000, univ=uni, mod=nModelo)
     model1.training()
-
-    model2 = Model(train_set, test_set, reg=True, alpha=0.0002, lam=210, maxi=1050) #Se puede ver en la gráfica que hay SOBRE-AJUSTE
+    
+    nModelo =2;
+    model2 = Model(train_set, test_set, reg=True, alpha=0.0002, lam=410, maxi=1050, univ=uni, mod=nModelo)
     model2.training()
-    model3 = Model(train_set, test_set, reg=True, alpha=0.00005, lam=250, maxi=2000) #Aquí también se puede ver sobre-ajuste
+    
+    nModelo =3;
+    model3 = Model(train_set, test_set, reg=True, alpha=0.00005, lam=250, maxi=2000, univ=uni, mod=nModelo)
     model3.training()
-
-    model4 = Model(train_set, test_set, reg=True, alpha=0.0003, lam=300, maxi=3100) #Se ajusta mejor con la regulariación de 300, pero se tarda más
+    
+    nModelo = 4;
+    model4 = Model(train_set, test_set, reg=True, alpha=0.0003, lam=300, maxi=3100, univ=uni, mod=nModelo) #Se ajusta mejor con la regulariación de 300, pero se tarda más
     model4.training()
-    model5 = Model(train_set, test_set, reg=False, alpha=0.00008, lam=150, maxi=1200) #Baja más quitandole la regularización
+    
+    nModelo = 5;
+    model5 = Model(train_set, test_set, reg=False, alpha=0.00008, lam=150, maxi=1200, univ=uni, mod=nModelo) #Baja más quitandole la regularización
     model5.training()
     #model2.training()
 
     # Se grafican los entrenamientos
     #Plotter.show_Model([model1, model2])
-    Plotter.show_Model([model1, model2, model3, model4, model5])
+    Plotter.show_Model([model1, model2, model3, model4, model5], uni)
     #Plotter.show_Model([model2])
     #return 1
  
@@ -91,7 +100,7 @@ def guardarImage(jso):
         base = m[i]["base"]
        # print(base[23:])
         imgdata = base64.b64decode(base[23:])
-        filename = m[i]["nombre"]  # I assume you have a way of picking unique filenames
+        filename = m[i]["nombre"] 
         with open('iprueba/'+filename, 'wb') as f:
             f.write(imgdata)
 
@@ -100,7 +109,9 @@ app = Flask(__name__)
 
 @app.route("/cuerpo",  methods = ['POST'])
 def cuerpo():
-    ejecutar()
+    universidades = ['Mariano', 'USAC', 'Landivar', 'Marroquin']
+    for i in range(0, len(universidades)):
+        ejecutar(universidades[i])
     #print(request.get_json())
     guardarImage(request.get_json())
     #p = ejecutar(request.get_json())

@@ -7,10 +7,14 @@ def show_picture(pixels):
     chart.show()
 
 
-def show_Model(models):
+def show_Model(models, nombreU):
+    #print(nombreU)
     for model in models:
         chart.plot(model.bitacora, label=str(model.alpha))
     chart.ylabel('Costo')
     chart.xlabel('Iteraciones')
     legend = chart.legend(loc='upper center', shadow=True)
-    chart.show()
+    chart.savefig('graficas/' +nombreU+ '.png', dpi=300, bbox_inches='tight')
+    models.clear()
+    chart.clf()
+    #chart.show()
