@@ -148,8 +148,24 @@ function enviardata(datos) {
           data: data,
           success: function (data) {
 
-                //console.log(data);
+                console.log(data.success);
+
+                html = "";
+if (data !=null) {
+    console.log("entre");
+
+  for (i = 0; i < data.success.length; i++) {
+      html += '<tr>';
+      html += '<td>' + data.success[i][0] + '</td>';
+      html += '<td>' + data.success[i][1] + '%</td>';
+      html += '</tr>';
 
           }
+
+        }
+
+  $("#body-exactitud").html(html);
+}
+
       });
 }

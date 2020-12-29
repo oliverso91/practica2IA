@@ -64,26 +64,19 @@
       <h2>Practica 2</h2>
     </div>
     <div class="col-12">
-              <h4 class="mb-3">Seleccione Universidad para el Modelo</h4>
-              <div>
-                <div class="my-3">
-            <div class="form-check">
-              <input id="USAC" name="padres" type="radio" class="form-check-input" value="USAC">
-              <label class="form-check-label" for="USAC">Universidad de San Carlos de Guatemala</label>
-            </div>
-            <div class="form-check">
-              <input id="Mariano" name="padres" type="radio" class="form-check-input" value="Mariano">
-              <label class="form-check-label" for="Mariano">Universidad Mariano Galvez</label>
-            </div>
-            <div class="form-check">
-              <input id="Landivar" name="padres" type="radio" class="form-check-input" value="Landivar">
-              <label class="form-check-label" for="Landivar">Universidad Rafael Landivar</label>
-            </div>
-            <div class="form-check">
-              <input id="Marroquin" name="padres" type="radio" class="form-check-input" value="Marroquin">
-              <label class="form-check-label" for="Marroquin">Universidad Francisco Marroquin</label>
-            </div>
-          </div>
+      <div class="table-responsive" >
+        <table class="table table-striped no-margin" id="Curtabla">
+          <thead class="thead-light">
+             <tr>
+                <th scope="col">Universidad</th>
+                <th scope="col">Exactitud del modelo</th>
+
+             </tr>
+          </thead>
+          <tbody id="body-exactitud" style="color: black">
+          </tbody>
+        </table>
+      </div>
 
           </div>
 
@@ -91,7 +84,7 @@
 <div class="col-4">
 <button class="w-100 btn btn-primary btn-lg" type="submit" id="generar">Generar Modelo</button>
   </div>
-  
+
           </div>
 
     <div class="row g-3">

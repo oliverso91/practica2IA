@@ -11,12 +11,7 @@ source = None
 def load_dataset(uni):
     #print(uni)
     data = []
-    
-    pathM = "imagen/Mariano/"
-    pathU = "imagen/USAC/"
-    pathL = "imagen/Landivar/"
-    pathF = "imagen/Marroquin/"
-    
+
     #univerisades
     univerisades = ['Mariano', 'USAC', 'Landivar', 'Marroquin']
     
@@ -34,7 +29,7 @@ def load_dataset(uni):
     
     random.shuffle(data)
     
-    slice_point = int(len(data) * 0.8)
+    slice_point = int(len(data) * 0.7)
     train_set = data[:slice_point]
     test_set = data[slice_point:]
     

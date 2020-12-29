@@ -59,6 +59,8 @@ class Model:
         file.write("Prueba: " +str(self.test_accuracy) + "\n")
         file.write("----------------------------\n")
         file.close()
+        
+        return self.test_accuracy
 
     def update_coefficients(self, gradient):
         self.betas -= self.alpha * gradient
@@ -103,4 +105,13 @@ class Model:
         y_hat = self.sigmoide(np.dot(self.betas.T, x))
         result = y_hat >= 0.5
         return result.astype(int)
-
+        
+    def predecir(self, image):
+        train_set_x = image.reshape(image.shape[0], -1).T
+        test_set = Data(train_set_x, train_set_x, 255)
+        
+        y_hat = self.sigmoide(np.dot(self.betas.T, test_set.x))
+        result = y_hat >= 0.5
+        #print(result)
+        
+        return result.astype(int)

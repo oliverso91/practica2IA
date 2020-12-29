@@ -9,26 +9,24 @@ from Logistic_Regression.Data import Data
 from Logistic_Regression import Plotter
 import numpy as np
 import base64
+import matplotlib.pyplot as plt
+import glob
+import os
 
 def ejecutar(universidad):
 
     #y = json.dumps(parametroU)
     #m = json.loads(y)
     #parametro = m["universidad"]
+    modelos = []
+    selModelo = []
     nModelo = 0;
-    ONLY_SHOW = False #Veo si quiero mostrar una imagen del conjunto de datos
+
 
     #Cargando conjuntos de datos con for para hacer todos los modelos de una vez 
     
     train_set_x_orig, train_set_y, test_set_x_orig, test_set_y, uni, classes = File.load_dataset(universidad)
     
-    if ONLY_SHOW:
-        #index = 14 #Gato
-        index = 100 #No Gato
-        index = 54 #Gato
-        Plotter.show_picture(train_set_x_orig[index])
-        print(classes[train_set_y[0][index]])
-        exit()
 
     # Convertir imagenes a un solo arreglo
     train_set_x = train_set_x_orig.reshape(train_set_x_orig.shape[0], -1).T
@@ -65,30 +63,85 @@ def ejecutar(universidad):
     # Se entrenan los modelos
     nModelo = 1;
     model1 = Model(train_set, test_set, reg=False, alpha=0.001, lam=310, maxi=1000, univ=uni, mod=nModelo)
-    model1.training()
+    modelo1 = model1.training()
+    
+    selModelo.append(["model1", modelo1])
     
     nModelo =2;
     model2 = Model(train_set, test_set, reg=True, alpha=0.0002, lam=410, maxi=1050, univ=uni, mod=nModelo)
-    model2.training()
+    modelo2 = model2.training()
+    
+    selModelo.append(["model2", modelo2])
     
     nModelo =3;
-    model3 = Model(train_set, test_set, reg=True, alpha=0.00005, lam=250, maxi=2000, univ=uni, mod=nModelo)
-    model3.training()
+    model3 = Model(train_set, test_set, reg=True, alpha=0.00005, lam=250, maxi=1200, univ=uni, mod=nModelo)
+    modelo3 = model3.training()
+    
+    selModelo.append(["model3", modelo3])
     
     nModelo = 4;
-    model4 = Model(train_set, test_set, reg=True, alpha=0.0003, lam=300, maxi=3100, univ=uni, mod=nModelo) #Se ajusta mejor con la regulariación de 300, pero se tarda más
-    model4.training()
+    model4 = Model(train_set, test_set, reg=True, alpha=0.0003, lam=300, maxi=1600, univ=uni, mod=nModelo)
+    modelo4 = model4.training()
+    
+    selModelo.append(["model4", modelo4])
     
     nModelo = 5;
-    model5 = Model(train_set, test_set, reg=False, alpha=0.00008, lam=150, maxi=1200, univ=uni, mod=nModelo) #Baja más quitandole la regularización
-    model5.training()
-    #model2.training()
+    model5 = Model(train_set, test_set, reg=False, alpha=0.00008, lam=150, maxi=1200, univ=uni, mod=nModelo)
+    modelo5 = model5.training()
+    
+    selModelo.append(["model5", modelo5])
+    
 
-    # Se grafican los entrenamientos
-    #Plotter.show_Model([model1, model2])
+
     Plotter.show_Model([model1, model2, model3, model4, model5], uni)
-    #Plotter.show_Model([model2])
-    #return 1
+    modelos = np.array([modelo1, modelo2, modelo3, modelo4, modelo5])
+    
+    masAlto = np.max(modelos)
+    
+    for i in range(0, 5):
+        if(selModelo[i][1] == masAlto):
+            print("el mejor modelo es: " + str (selModelo[i][0]))
+          
+            p = []
+            datosF = []
+            contador = 0
+            denominador = 0
+            coincidencias = 0
+            path = "iprueba/"
+            data_path = os.path.join(path,'*g')
+            files = glob.glob(data_path)
+            for f1 in files: 
+                    #print(f1)
+                    #print(f1.find("Mariano"))
+                    coincidencias = f1.find(uni)
+                    if(coincidencias > 1):
+                        denominador +=1
+                        
+                    image = plt.imread(f1)
+                    p.append(image)
+                    
+            #print('p: ', p)
+            grades = np.array(p)
+            #print('grades: ', grades)
+            result = model1.predecir(grades)
+            print('----' + str(result))
+            
+            datosF = np.array(result)
+            #print(len(np.where(datosF == 1)[0]))
+            #print(len(datosF))
+            
+            contador = len(np.where(datosF == 1)[0])
+            #denominador = len(np.where(datosF == 1)[0]) + len(np.where(datosF == 0)[0])
+            exactitud = (contador / denominador) *100
+            
+            print("la exactitud es: " + str(exactitud))
+            
+            return exactitud
+            break
+        
+    #Plotter.show_Model([model1], uni)
+    
+   
  
 def guardarImage(jso):
     
@@ -105,17 +158,22 @@ def guardarImage(jso):
             f.write(imgdata)
 
 
+
 app = Flask(__name__)
 
 @app.route("/cuerpo",  methods = ['POST'])
 def cuerpo():
+    datos = []
+    guardarImage(request.get_json())
     universidades = ['Mariano', 'USAC', 'Landivar', 'Marroquin']
     for i in range(0, len(universidades)):
-        ejecutar(universidades[i])
-    #print(request.get_json())
-    guardarImage(request.get_json())
+        exactitud = ejecutar(universidades[i])
+        datos.append([universidades[i], exactitud])
+    print(datos)
+    
+    #predecir()
     #p = ejecutar(request.get_json())
-    return json.dumps({'success':'si'}), 200, {'ContentType':'application/json'}
+    return json.dumps({'success': datos}), 200, {'ContentType':'application/json'}
 
 if __name__ == "__main__":
     app.run()
